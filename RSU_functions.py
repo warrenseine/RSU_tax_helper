@@ -32,11 +32,11 @@ def get_stock_price_euro(dt, criteo_stock_dict=criteo_stock_dict,
 
 def compute_rebate(selling_date_dt, vesting_date_dt):
     if (selling_date_dt - vesting_date_dt).days < 365 * 2:
-        return 1
+        return 0
     elif (selling_date_dt - vesting_date_dt).days < 365 * 8:
         return 0.5
     else:
-        return 0.35
+        return 0.65
 
 
 # The more than 300k is not handled yet, if you did sell more than 300k of action do not rely
@@ -56,8 +56,7 @@ def compute_tax_info_from_matched_transaction(selling_date_dt, vesting_date_dt,
             vesting_price_with_moins_value = selling_price
         rebate = compute_rebate(selling_date_dt, vesting_date_dt)
         # Not excatly it, not sure how to handle rebate and deductible csg at the same time, upper bound
-        tax_to_pay = vesting_price_with_moins_value * (
-                rebate * tax_info_dict['TMI_IR'] + tax_info_dict[
+        tax_to_pay = vesting_price_with_moins_value * ( (1- rebate) * tax_info_dict['TMI_IR'] + tax_info_dict[
             'cotisation']) + plus_value * tax_info_dict[
                          'flat_tax_plus_value']
         return {'vesting_price': vesting_price,
@@ -131,7 +130,7 @@ def get_sale_order_from_optionality(sell_event, portfolio,
                                                              criteo_stock_dict=criteo_stock_dict,
                                                              exchange_rate_dict=exchange_rate_dict)
         score_for_sorting = -np.abs(np.log(selling_price / tax_info[
-            'vesting_price_with_moins_value'])) - 100 * (tax_info['rebate'] < 1)
+            'vesting_price_with_moins_value'])) - 100 * (tax_info['rebate'] > 0)
         sale_tax_info.append({'position': i, 'available_stock': event['amount'],
                               'tax': tax_info['tax'],
                               'score_for_sorting': score_for_sorting})
@@ -214,13 +213,11 @@ def get_sales_result(sell_event, portfolio,
             'vesting_amount_with_moins_value': vested_action_sale[
                                                    'share_sold'] * tax_info[
                                                    'vesting_price_with_moins_value'],
-            'vesting_amount_with_moins_and_rebate': vested_action_sale[
+            'rebate_without_moins_value': vested_action_sale[
                                                         'share_sold'] *
                                                     tax_info[
-                                                        'vesting_price_with_moins_value'] *
+                                                        'vesting_price'] *
                                                     tax_info['rebate'],
-            'plus_value_amount': vested_action_sale['share_sold'] * tax_info[
-                'plus_value'],
             'rebate': tax_info['rebate'],
             'tax': vested_action_sale['share_sold'] * tax_info['tax']
         })
