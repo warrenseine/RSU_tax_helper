@@ -5,6 +5,7 @@ import copy
 
 tax_info_dict = {'TMI_IR': 0.3, 'cotisation': 0.172, 'flat_tax_plus_value': 0.3}
 
+#./RSU_tax_helper/
 taux = pd.read_csv('./RSU_tax_helper/Euro_exchange.csv')
 criteo_stock = pd.read_csv('./RSU_tax_helper/HistoricalData_1620982164139.csv')
 criteo_stock['stock_price'] = criteo_stock['Open'].apply(lambda x: float(x[1:]))
@@ -29,6 +30,10 @@ def get_stock_price_euro(dt, criteo_stock_dict=criteo_stock_dict,
     stock_price_usd = get_value_on_date(dt, criteo_stock_dict)
     return stock_price_usd / get_value_on_date(dt, exchange_rate_dict)
 
+def get_stock_price_euro_from_price_in_USD(dt, stock_price_USD,
+                         exchange_rate_dict=exchange_rate_dict):
+
+    return stock_price_USD / get_value_on_date(dt, exchange_rate_dict)
 
 def compute_rebate(selling_date_dt, vesting_date_dt):
     if (selling_date_dt - vesting_date_dt).days < 365 * 2:
@@ -40,13 +45,13 @@ def compute_rebate(selling_date_dt, vesting_date_dt):
 
 
 # The more than 300k is not handled yet, if you did sell more than 300k of action do not rely
-def compute_tax_info_from_matched_transaction(selling_date_dt, vesting_date_dt,
+def compute_tax_info_from_matched_transaction(selling_date_dt, vesting_date_dt, selling_price_USD,
                                               macron_law_id=0,
                                               tax_info_dict=tax_info_dict,
                                               criteo_stock_dict=criteo_stock_dict,
                                               exchange_rate_dict=exchange_rate_dict):
     vesting_price = get_stock_price_euro(vesting_date_dt)
-    selling_price = get_stock_price_euro(selling_date_dt)
+    selling_price = get_stock_price_euro_from_price_in_USD(selling_date_dt, selling_price_USD)
     if macron_law_id == 0:  # for now as I don't handle the 300k, does not change anything
         if selling_price >= vesting_price:
             plus_value = selling_price - vesting_price
@@ -79,6 +84,7 @@ def get_sale_order_greedy(sell_event, portfolio, tax_info_dict=tax_info_dict,
     for i, event in enumerate(portfolio['available_stock']):
         tax_info = compute_tax_info_from_matched_transaction(sell_event['date'],
                                                              event['date'],
+                                                             sell_event['stock_unit_price_USD'],
                                                              macron_law_id=
                                                              event[
                                                                  'macron_law_id'],
@@ -118,11 +124,12 @@ def get_sale_order_from_optionality(sell_event, portfolio,
     # theories, it should be close to the optimal (meaning you should pay less next year and over the two years)
     # I am priorizing stock with rebate to be sold first, and then I take the opportunity the furthest from the stock price
     sale_tax_info = []
-    selling_price = get_stock_price_euro(sell_event['date'])
+    selling_price = get_stock_price_euro_from_price_in_USD(sell_event['date'], sell_event['stock_unit_price_USD'])
 
     for i, event in enumerate(portfolio['available_stock']):
         tax_info = compute_tax_info_from_matched_transaction(sell_event['date'],
                                                              event['date'],
+                                                             selling_price,
                                                              macron_law_id=
                                                              event[
                                                                  'macron_law_id'],
@@ -130,7 +137,7 @@ def get_sale_order_from_optionality(sell_event, portfolio,
                                                              criteo_stock_dict=criteo_stock_dict,
                                                              exchange_rate_dict=exchange_rate_dict)
         score_for_sorting = -np.abs(np.log(selling_price / tax_info[
-            'vesting_price_with_moins_value'])) - 100 * (tax_info['rebate'] > 0)
+            'vesting_price'])) - 100 * (tax_info['rebate'] > 0)
         sale_tax_info.append({'position': i, 'available_stock': event['amount'],
                               'tax': tax_info['tax'],
                               'score_for_sorting': score_for_sorting})
@@ -191,6 +198,7 @@ def get_sales_result(sell_event, portfolio,
         tax_info = compute_tax_info_from_matched_transaction(sell_event['date'],
                                                              vested_event[
                                                                  'date'],
+                                                             sell_event['stock_unit_price_USD'],
                                                              macron_law_id=
                                                              vested_event[
                                                                  'macron_law_id'],
