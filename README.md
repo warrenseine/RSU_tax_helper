@@ -7,7 +7,8 @@ How to use
 =========
 
 * Install [Jupyter notebook](https://jupyter.org/install)
-* From the root of this repo run `jupyter notebook`
+* in a repo, using the comand line (cmd) run git clone https://github.com/BasileLeparmentier/RSU_tax_helper.git.
+* From the root of this repo run `jupyter notebook` in the command line
 * Select the file `RSU_tax_computer_for_open_from_github.ipynb` in your browser
 * You might need to install python dependencies if you have runtime errors (eg: `pip install pandas`)
 * Put your own information for all your vesting (with the vesting date, and the number of shares) and all your sold share with again the date and the amount sold (in shares, not euro).
