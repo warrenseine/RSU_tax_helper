@@ -6,8 +6,8 @@ import copy
 tax_info_dict = {'TMI_IR': 0.3, 'cotisation': 0.172, 'flat_tax_plus_value': 0.3}
 
 # ./RSU_tax_helper/
-taux = pd.read_csv('./RSU_tax_helper/Euro_exchange.csv')
-criteo_stock = pd.read_csv('./RSU_tax_helper/HistoricalData_1620982164139.csv')
+taux = pd.read_csv('Euro_exchange.csv')
+criteo_stock = pd.read_csv('HistoricalData_1620982164139.csv')
 criteo_stock['stock_price'] = criteo_stock['Open'].apply(lambda x: float(x[1:]))
 criteo_stock['date_dt'] = criteo_stock.Date.apply(
     lambda x: datetime.datetime.strptime(x, '%m/%d/%Y').strftime('%d/%m/%Y'))
