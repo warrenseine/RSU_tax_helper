@@ -18,6 +18,7 @@ How to use
 (easy for non jupyter common users)
 
 1 - add google colab pluggin to chrome https://chrome.google.com/webstore/detail/open-in-colab/iogfkhleblhcpcekbiedikdehleodpjo?hl=en
+
 2 - use this link https://drive.google.com/file/d/1JJ3BlyS2TozCfEBVC_tMv82XNgjSBTse/view?usp=sharing and click on top on open on colab
 
 Disclaimer: I am no accountant, I did this to help, I hope there are no mistake, but If there is, first I am sorry, but I am not responsible
