@@ -3,6 +3,8 @@ import datetime as datetime
 import numpy as np
 import copy
 
+from dateutil.relativedelta import relativedelta
+
 tax_info_dict = {'TMI_IR': 0.3, 'cotisation': 0.172, 'flat_tax_plus_value': 0.3}
 
 # ./RSU_tax_helper/
@@ -37,9 +39,9 @@ def get_stock_price_euro_from_price_in_USD(dt, stock_price_USD,
 
 
 def compute_rebate(selling_date_dt, vesting_date_dt):
-    if (selling_date_dt - vesting_date_dt).days < 365 * 2:
+    if relativedelta(selling_date_dt, vesting_date_dt).years < 2:
         return 0
-    elif (selling_date_dt - vesting_date_dt).days < 365 * 8:
+    elif relativedelta(selling_date_dt, vesting_date_dt).years < 8:
         return 0.5
     else:
         return 0.65
