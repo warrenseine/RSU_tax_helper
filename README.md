@@ -15,11 +15,11 @@ How to use
 * Then just run the notebook and you will have all information to report in the cells at the end.
 
 
-## Using google colab:
+## Using Binder:
 (easy for non jupyter common users)
 
-1 - add google colab pluggin to chrome https://chrome.google.com/webstore/detail/open-in-colab/iogfkhleblhcpcekbiedikdehleodpjo?hl=en
+1 -follow this link (takes some time to load sorry) https://mybinder.org/v2/gh/BasileLeparmentier/RSU_tax_helper/HEAD?filepath=RSU_tax_computer.ipynb
 
-2 - use this link https://drive.google.com/file/d/1JJ3BlyS2TozCfEBVC_tMv82XNgjSBTse/view?usp=sharing and click on top on open on colab
+2 - Then fill your data in cell [4], and launch kernel restart and run all in the kernel menu at the top.
 
 Disclaimer: I am no accountant, I did this to help, I hope there are no mistake, but If there is, first I am sorry, but I am not responsible
